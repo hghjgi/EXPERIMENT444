@@ -53,8 +53,8 @@ MNIST是手写数字灰度数据集，包含0~9共10个类别。
 5. 测试评估：每轮训练结束后在测试集验证，输出loss和acc。
 
 ## 五、实验结果
-训练轮次：30 epoch
-每轮输出测试集loss、准确率acc
+epoch:29, loss:0.5981, acc:0.8638
+<img width="430" height="208" alt="image" src="https://github.com/user-attachments/assets/b0d08c85-f9ef-44b5-8e9e-fa2b65ba12cf" />
 现象：训练初期损失快速下降、准确率快速上升；训练后期收敛变慢，准确率提升幅度变小。
 
 ## 六、结果分析
