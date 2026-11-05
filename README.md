@@ -35,13 +35,67 @@ ReLU激活函数有效缓解梯度消失，提升模型拟合能力。实验采�
 每轮训练结束后，将模型切换为评估模式，关闭梯度计算以提升推理效率。通过计算测试集分类准确率与平均损失，客观评价模型的识别精度与泛化能力。
 
 ## 四、实验代码
-完整代码文件：`mlp_mnist.ipynb`
-代码分为5个模块：
-1. 包导入：导入torch、torchvision、数据集、优化器等；
-2. 数据集加载：使用`torchvision.datasets.MNIST`，ToTensor归一化，DataLoader分批加载；
-3. 网络定义：继承`nn.Module`，重写`__init__`与`forward`前向函数；
-4. 训练循环：遍历训练集，完成梯度更新；
-5. 测试评估：每轮训练结束后在测试集验证，输出loss和acc。
+## 四、实验代码
+本实验基于教师提供的代码框架完成，代码如下：
+```python
+import torch
+import torch.nn.functional as F
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
+
+# 数据集加载
+transform = transforms.Compose([transforms.ToTensor()])
+train_data = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+test_data = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
+
+train_loader = DataLoader(train_data, batch_size=2048, shuffle=True)
+test_loader = DataLoader(test_data, batch_size=2048, shuffle=False)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# 定义MLP模型
+class MLP(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = torch.nn.Linear(784,128)
+        self.fc2 = torch.nn.Linear(128,10)
+    def forward(self,x):
+        x = x.view(x.shape[0],-1)
+        x1 = self.fc1(x)
+        x = F.relu(x1)
+        a2 = self.fc2(x)
+        return a2
+
+model = MLP().to(device)
+optimizer = torch.optim.SGD(model.parameters(),lr=0.01)
+epochs = 30
+
+# 训练循环
+for epoch in range(epochs):
+    model.train()
+    for batch_idx,(x,y) in enumerate(train_loader):
+        x,y = x.view(x.shape[0],-1).to(device),y.to(device)
+        optimizer.zero_grad()
+        output = model(x)
+        loss = F.cross_entropy(output,y)
+        loss.backward()
+        optimizer.step()
+
+    # 测试评估
+    model.eval()
+    correct = 0
+    test_loss = 0
+    with torch.no_grad():
+        for batch_idx,(x,y) in enumerate(test_loader):
+            x,y = x.view(x.shape[0],-1).to(device),y.to(device)
+            output = model(x)
+            test_loss += F.cross_entropy(output,y)
+            pred = output.max(1,keepdim=True)[1]
+            correct += pred.eq(y.view_as(pred)).sum().item()
+    test_loss = test_loss/(batch_idx+1)
+    acc = correct/len(test_loader.dataset)
+    print("epoch:{}, loss:{:.4f}, acc:{:.4f}".format(epoch,test_loss,acc))
+```
 
 ## 五、实验结果
 - epoch:29, loss:0.5981, acc:0.8638
