@@ -1,5 +1,10 @@
-# EXPERIMENT444
-# 实验：全连接神经网络
+# 实验四：全连接神经网络
+<div>
+    <span style="float: left">学生姓名: 彭艺琼</span>
+    <span style="float: right">指导老师: 胡政伟</span>
+</div>
+<center>学号: 202410315019 </center>
+<br>
 
 ## 一、实验目的
 1. 理解多层感知机（MLP）的基本原理，掌握全连接层、激活函数的作用；
